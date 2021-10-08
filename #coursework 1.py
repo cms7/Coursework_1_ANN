@@ -22,7 +22,9 @@ class NeuralNetwork:
     #hyperparameters
     learning_rate = 0.1;
 
-    def gradient_descent():
+    data = pd.read_csv("DATASET.csv")
+    data.hist("Output")
+
         
 
 
