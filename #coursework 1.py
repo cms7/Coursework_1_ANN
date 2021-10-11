@@ -38,9 +38,9 @@ class NeuralNetwork:
     #hyperparameters
     learning_rate = 0.1;
 
+    #code for interpreting the data
     data = pd.read_csv("DATASET.csv")
-
-
-        
+    n_inputs = (len(list(data))-1)*(len(data))
+    n_outputs = 2   
 
 
