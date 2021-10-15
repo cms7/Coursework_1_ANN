@@ -9,8 +9,8 @@ from random import random, seed
 # e.g. 3 inputs: weights = [0.1 , 0.3 , 0.2, 0.6] where element [-1] is the bias
 def initialize_network(n_inputs, n_hidden, n_outputs):
     network = list()
-    w1 = [{'weights': [random() for i in range(n_inputs)]} for i in range(n_hidden)]
-    w2 = [{'weights': [random() for i in range(n_hidden)]} for i in range(n_outputs)]
+    w1 = [{'weights': [random() for i in range(n_inputs+1)]} for i in range(n_hidden)]
+    w2 = [{'weights': [random() for i in range(n_hidden+1)]} for i in range(n_outputs)]
     network.append(w1)
     network.append(w2)
     return network
