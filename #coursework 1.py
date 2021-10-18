@@ -73,7 +73,7 @@ def tanh_derivitive(neuron_output):
     return 1 - np.tanh(neuron_output)**2
 
 def relu_derivitive(neuron_output):
-    if(neuron_output<=0):
+    if(neuron_output<0):
         return 0
     else: 
         return 1
