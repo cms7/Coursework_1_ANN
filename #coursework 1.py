@@ -65,10 +65,18 @@ output = forward_prop(network, row)
 print(output)
 
 
-# calculates the derivative of the neuron output
-def neuron_derivitive(neuron_output):
-    return neuron_output*(1-neuron_output)
+# calculates the derivatives of the neuron output for all activation functions
+def sigmoid_derivitive(neuron_output):
+    return sigmoid(neuron_output*(1-sigmoid(neuron_output)))
 
+def tanh_derivitive(neuron_output):
+    return 1 - np.tanh(neuron_output)**2
+
+def relu_derivitive(neuron_output):
+    if(neuron_output<=0):
+        return 0
+    else: 
+        return 1
 
 # code for interpreting the data
 data = pd.read_csv("DATASET.csv")
