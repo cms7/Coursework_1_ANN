@@ -15,10 +15,14 @@ def initialize_network(n_inputs, n_hidden, n_outputs):
     network.append(w2)
     return network
 
-# hyperparameters
-learning_rate = 0.1
-num_epochs = 200
-activation_func = "sigmoid"
+    
+# hyperparameters - the hyperparameters are set by the user when the terminal prompts input 
+print("Please enter a learning rate between 0.01 and 1")
+learning_rate = input()
+print("Please enter the number of epochs - up to 20000")
+num_epochs = input()
+print("Please choose an activation function of the following - sigmoid , tanh , relu ")
+activation_func = input()
 
 # activation functions which takes an imput and produces a number between 0-1
 def sigmoid(inpt):
@@ -30,17 +34,18 @@ def tanh(inpt):
 def relu(inpt):
     return max(inpt, 0)
 
-def sum_of_weights(weights, inputs):
-	sum = 0 
+#function which will calculate the weighted sum of weights and inputs + a bias 
+def weighted_sum(weights, inputs):
+	sum = weights[-1]
 	for i in range(len(weights)-1):
-		sum += weights[i]*inputs[i]+weights[-1]
+		sum += weights[i]*inputs[i]
 	return sum
 
 def forward_prop(network,input):
     for layer in network:
         temp = []
         for neuron in layer:
-            sum = sum_of_weights(neuron['weights'],input)
+            sum = weighted_sum(neuron['weights'],input)
             if(activation_func == "sigmoid"):
                 neuron['output'] = sigmoid(sum)
             elif(activation_func == "relu"):
@@ -53,7 +58,8 @@ def forward_prop(network,input):
         output = temp
     return output
 
-network = initialize_network(2,1,2)
+seed(1)
+network = initialize_network(2,1,1)
 row = [1, 0, None]
 output = forward_prop(network, row)
 print(output)
@@ -62,7 +68,6 @@ print(output)
 # calculates the derivative of the neuron output
 def neuron_derivitive(neuron_output):
     return neuron_output*(1-neuron_output)
-
 
 
 # code for interpreting the data
