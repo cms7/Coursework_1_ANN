@@ -78,6 +78,9 @@ def relu_derivitive(neuron_output):
     else: 
         return 1
 
+
+
 # code for interpreting the data
 data = pd.read_csv("DATASET.csv")
-n_inputs = (len(list(data))-1)*(len(data))
+n_inputs = len(data[0])-1
+n_outputs = len(set([row[-1] for row in data]))
