@@ -1,8 +1,15 @@
-# coursework 1
-
-import pandas as pd
+from random import random,seed
+from math import exp
 import numpy as np
-from random import random, seed
+import pandas as pd
+
+# hyperparameters - the hyperparameters are set by the user when the terminal prompts input 
+print("Please enter a learning rate between 0.01 and 1")
+learning_rate = float(input())
+print("Please enter the number of epochs - up to 20000")
+num_epochs = int(input())
+print("Please choose an activation function of the following - sigmoid , tanh , relu ")
+activation_func = input()
 
 # function to intitialise a network taking adjustable numbers of inputs, hidden and outputs
 # funtion will generate random weights for each input value, a bias is also genererated and will be the last element in the array
@@ -15,37 +22,43 @@ def initialize_network(n_inputs, n_hidden, n_outputs):
     network.append(w2)
     return network
 
-    
-# hyperparameters - the hyperparameters are set by the user when the terminal prompts input 
-print("Please enter a learning rate between 0.01 and 1")
-learning_rate = input()
-print("Please enter the number of epochs - up to 20000")
-num_epochs = input()
-print("Please choose an activation function of the following - sigmoid , tanh , relu ")
-activation_func = input()
-
 # activation functions which takes an imput and produces a number between 0-1
 def sigmoid(inpt):
-    return 1/1+np.exp(-inpt)
+    return 1/(1+np.exp(-inpt))
 
 def tanh(inpt):
     return np.tanh(inpt)
 
 def relu(inpt):
-    return max(inpt, 0)
+    return np.maximum(0,inpt)
 
-#function which will calculate the weighted sum of weights and inputs + a bias 
-def weighted_sum(weights, inputs):
+# calculates the derivatives of the neuron output for all activation functions
+def sigmoid_derivative(neuron_output):
+    return sigmoid(neuron_output)*(1-sigmoid(neuron_output))
+
+def tanh_derivative(neuron_output):
+    return 1 - tanh(neuron_output)**2
+
+def relu_derivative(neuron_output):
+    if(neuron_output<0):
+        return 0
+    else: 
+        return 1
+
+# Calculate neuron activation for an input
+def sum_weights(weights, inputs):
 	sum = weights[-1]
 	for i in range(len(weights)-1):
-		sum += weights[i]*inputs[i]
+		sum += weights[i] * float(inputs[i])
 	return sum
-
-def forward_prop(network,input):
+ 
+# Forward propagate input to a network output 
+def forward_prop(network,row):
+    inputs = row
     for layer in network:
         temp = []
         for neuron in layer:
-            sum = weighted_sum(neuron['weights'],input)
+            sum = sum_weights(neuron['weights'],inputs)
             if(activation_func == "sigmoid"):
                 neuron['output'] = sigmoid(sum)
             elif(activation_func == "relu"):
@@ -55,32 +68,58 @@ def forward_prop(network,input):
             else:
                 print("Please check hyperparameter activation_func")
             temp.append(neuron['output'])
-        output = temp
-    return output
+        inputs = temp
+    return inputs
+
+# Backpropagate error and store in neurons
+def backward_propagate_error(network, expected):
+	for i in reversed(range(len(network))):
+		layer = network[i]
+		errors = list()
+		if i != len(network)-1:
+			for j in range(len(layer)):
+				error = 0.0
+				for neuron in network[i + 1]:
+					error += (neuron['weights'][j] * neuron['delta'])
+				errors.append(error)
+		else:
+			for j in range(len(layer)):
+				neuron = layer[j]
+				errors.append(expected[j] - neuron['output'])
+		for j in range(len(layer)):
+			neuron = layer[j]
+			neuron['delta'] = errors[j] * sigmoid_derivative(neuron['output'])
+ 
+# Update network weights with error
+def update_weights(network, row):
+	for i in range(len(network)):
+		inputs = row[:-1]
+		if i != 0:
+			inputs = [neuron['output'] for neuron in network[i - 1]]
+		for neuron in network[i]:
+			for j in range(len(inputs)):
+				neuron['weights'][j] += learning_rate * neuron['delta'] * inputs[j]
+			neuron['weights'][-1] += learning_rate * neuron['delta']
+ 
+# Train a network for a fixed number of epochs
+def train_network(network, train, n_outputs):
+	for epoch in range(num_epochs):
+		sum_error = 0
+		for row in train:
+			outputs = forward_prop(network, row)
+			expected = [0 for i in range(n_outputs)]
+			expected[-1] = 1
+			sum_error += sum([(expected[i]-outputs[i])**2 for i in range(len(expected))])
+			backward_propagate_error(network, expected)
+			update_weights(network, row)
+		print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, learning_rate, sum_error))
+        
+ 
 
 seed(1)
-network = initialize_network(2,1,1)
-row = [1, 0, None]
-output = forward_prop(network, row)
-print(output)
-
-
-# calculates the derivatives of the neuron output for all activation functions
-def sigmoid_derivitive(neuron_output):
-    return sigmoid(neuron_output*(1-sigmoid(neuron_output)))
-
-def tanh_derivitive(neuron_output):
-    return 1 - np.tanh(neuron_output)**2
-
-def relu_derivitive(neuron_output):
-    if(neuron_output<0):
-        return 0
-    else: 
-        return 1
-
-
-
-# code for interpreting the data
-data = pd.read_csv("DATASET.csv")
-n_inputs = len(data[0])-1
-n_outputs = len(set([row[-1] for row in data]))
+dataset = pd.read_csv('DATASET.csv')
+data = np.array(dataset,float)
+n_inputs = len(dataset.columns) - 1
+n_outputs = len(set([row[-1] for row in dataset]))
+network = initialize_network(n_inputs, 2, n_outputs)
+train_network(network, data, n_outputs)
