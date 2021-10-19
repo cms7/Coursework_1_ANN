@@ -128,6 +128,7 @@ def train_network(network, train, n_outputs):
     x = np.array(epoch_l)
     y = np.array(error_l)
     plt.plot(x, y)
+    plt.legend('epochs','erros')
     plt.show()
 
 
