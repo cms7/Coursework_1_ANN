@@ -2,11 +2,8 @@ from os import error
 from random import random,seed
 import numpy as np
 import pandas as pd
-<<<<<<< HEAD:CW1.py
 import matplotlib.pyplot as plt
-=======
 from matplotlib import pyplot as plt
->>>>>>> 5667e523e0072d0403aa10827be729fa4f5f6054:#coursework 1.py
 
 # hyperparameters - the hyperparameters are set by the user when the terminal prompts input 
 print("Please enter a learning rate between 0.01 and 1")
@@ -19,11 +16,7 @@ activation_func = input()
 # function to intitialise a network taking adjustable numbers of inputs, hidden and outputs
 # funtion will generate random weights for each input value, a bias is also genererated and will be the last element in the array
 # e.g. 3 inputs: weights = [0.1 , 0.3 , 0.2, 0.6] where element [-1] is the bias
-<<<<<<< HEAD:CW1.py
 def initialize_network(n_inputs, n_hidden, n_hidden1, n_outputs):
-=======
-def initialize_network(n_inputs, n_hidden ,n_outputs):
->>>>>>> 5667e523e0072d0403aa10827be729fa4f5f6054:#coursework 1.py
     network = list()
     w1 = [{'weights': [random() for i in range(n_inputs+1)]} for i in range(n_hidden)]
     w2 = [{'weights': [random() for i in range(n_hidden+1)]} for i in range(n_hidden1)]
@@ -99,9 +92,6 @@ def backward_propagate_error(network, expected):
                 errors.append(expected[j] - neuron['output'])
         for j in range(len(layer)):
             neuron = layer[j]
-<<<<<<< HEAD:CW1.py
-            neuron['delta'] = errors[j] * sigmoid_derivative(neuron['output'])
-=======
             if(activation_func == "sigmoid"):
                 neuron['delta'] = errors[j] * sigmoid_derivative(neuron['output'])
             elif(activation_func == "relu"):
@@ -110,9 +100,6 @@ def backward_propagate_error(network, expected):
                 neuron['delta'] = errors[j] * tanh_derivative(neuron['output'])
             else:
                 print("Please check hyperparameter activation_func")
-            
->>>>>>> 5667e523e0072d0403aa10827be729fa4f5f6054:#coursework 1.py
- 
 # Update network weights with error
 def update_weights(network, row):
     for i in range(len(network)):
@@ -126,16 +113,9 @@ def update_weights(network, row):
  
 # Train a network for a fixed number of epochs
 def train_network(network, train, n_outputs):
-<<<<<<< HEAD:CW1.py
     error_l = []
     for epoch in range(num_epochs):
         sum_error = 0
-        
-=======
-    err = []
-    for epoch in range(num_epochs):
-        sum_error = 0
->>>>>>> 5667e523e0072d0403aa10827be729fa4f5f6054:#coursework 1.py
         for row in train:
             outputs = forward_prop(network, row)
             expected = [0 for i in range(n_outputs)]
@@ -144,7 +124,6 @@ def train_network(network, train, n_outputs):
             backward_propagate_error(network, expected)
             update_weights(network, row)
         print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, learning_rate, sum_error))
-<<<<<<< HEAD:CW1.py
         error_l.append(sum_error)
     epoch_l = []
     for k in range(0,num_epochs):
@@ -156,22 +135,6 @@ def train_network(network, train, n_outputs):
     plt.plot(x, y)
     plt.show()
 
-
-
-    
-=======
-        err.append(sum_error)
-
-    plt.plot(err,num_epochs)   
- 
->>>>>>> 5667e523e0072d0403aa10827be729fa4f5f6054:#coursework 1.py
-
-
-        
-    
-    
-
-    
 seed(1)
 dataset = pd.read_csv('DATASET.csv')
 data = np.array(dataset,float)
