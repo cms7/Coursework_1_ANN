@@ -125,14 +125,35 @@ def train_network(network, train, n_outputs):
             update_weights(network, row)
         print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, learning_rate, sum_error))
         error_l.append(sum_error)
+    #storing epochs values so they can be used for the following graphs
     epoch_l = []
     for k in range(0,num_epochs):
         epoch_l += [k]
-    print(error_l)
-    print(epoch_l)
-    x = np.array(epoch_l)
-    y = np.array(error_l)
-    plt.plot(x, y)
+
+    #coding of the graphs produced
+    fig = plt.figure(figsize=[7,5])
+    ax = plt.subplot(111)
+    l = ax.fill_between(epoch_l, error_l)
+    ax.legend(['Learning Rate = 0.01'])
+    l.set_facecolors([[.5,.5,.8,.3]])
+    l.set_edgecolors([[0, 0, .5, .3]])
+    l.set_linewidths([3])
+    #Set labels
+    ax.set_xlabel('Number of epochs')
+    ax.set_ylabel('Summed error')
+    ax.set_title('ReLU (rectified linear unit)')
+    ax.grid('on')
+
+    #Tweak labels
+    xlab = ax.xaxis.get_label()
+    ylab = ax.yaxis.get_label()
+    xlab.set_style('italic')
+    xlab.set_size(10)
+    ylab.set_style('italic')
+    ylab.set_size(10)
+    #tweaking plot title
+    ttl = ax.title
+    ttl.set_weight('bold')
     plt.show()
 
 seed(1)
