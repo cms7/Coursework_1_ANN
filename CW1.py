@@ -2,8 +2,8 @@ from os import error
 from random import random,seed
 import numpy as np
 import pandas as pd
-#import matplotlib.pyplot as plt
-#from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 # hyperparameters - the hyperparameters are set by the user when the terminal prompts input 
 print("Please enter a learning rate between 0.01 and 1")
@@ -143,30 +143,30 @@ def train_net(net, train):
         epoch_l += [k]
 
     #coding of the graphs produced
-    #fig = plt.figure(figsize=[7,5])
-    #ax = plt.subplot(111)
-    #l = ax.fill_between(epoch_l, error_l)
-    #ax.legend(['Learning Rate = 0.01'])
-    #l.set_facecolors([[.5,.5,.8,.3]])
-    #l.set_edgecolors([[0, 0, .5, .3]])
-    #l.set_linewidths([3])
+    fig = plt.figure(figsize=[7,5])
+    ax = plt.subplot(111)
+    l = ax.fill_between(epoch_l, error_l)
+    ax.legend(['Learning Rate = 0.01'])
+    l.set_facecolors([[.5,.5,.8,.3]])
+    l.set_edgecolors([[0, 0, .5, .3]])
+    l.set_linewidths([3])
     #Set labels
-    #ax.set_xlabel('Number of epochs')
-    #ax.set_ylabel('Summed error')
-    #ax.set_title('ReLU (rectified linear unit)')
-    #ax.grid('on')
+    ax.set_xlabel('Number of epochs')
+    ax.set_ylabel('Summed error')
+    ax.set_title('ReLU (rectified linear unit)')
+    ax.grid('on')
 
     #Tweak labels
-    #xlab = ax.xaxis.get_label()
-    #ylab = ax.yaxis.get_label()
-    #xlab.set_style('italic')
-    #xlab.set_size(10)
-    #ylab.set_style('italic')
-    #ylab.set_size(10)
+    xlab = ax.xaxis.get_label()
+    ylab = ax.yaxis.get_label()
+    xlab.set_style('italic')
+    xlab.set_size(10)
+    ylab.set_style('italic')
+    ylab.set_size(10)
     #tweaking plot title
-    #ttl = ax.title
-    #ttl.set_weight('bold')
-    #plt.show()
+    ttl = ax.title
+    ttl.set_weight('bold')
+    plt.show()
 
 seed(1)
 dataset = pd.read_csv('DATASET.csv')
