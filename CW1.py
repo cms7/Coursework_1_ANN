@@ -16,6 +16,7 @@ activation_func = input()
 # function to intitialise a network taking adjustable numbers of inputs, hidden and outputs
 # funtion will generate random weights for each input value, a bias is also genererated and will be the last element in the array
 # e.g. 3 inputs: weights = [0.1 , 0.3 , 0.2, 0.6] where element [-1] is the bias
+# number of hidden layers is configuarable through the funtion. 
 def initialize_network(n_inputs, n_hidden, n_hidden1, n_outputs):
     net = list()
     w1 = [{'weights': [random() for i in range(n_inputs+1)]} for i in range(n_hidden)]
@@ -51,6 +52,7 @@ def relu_derivative(node_output):
 
 # Calculate neuron activation for an input
 def sum_weights(weights, inputs):
+    # weights[-1] will act as the bias, this takes the last element in the array of weights, which previously was identified.
     sum = weights[-1]
     for i in range(len(weights)-1):
         sum += weights[i] * float(inputs[i])
@@ -62,6 +64,8 @@ def forward_prop(net,row):
     for layer in net:
         temp = []
         for node in layer:
+            #use the weighted sum of inputs and outputs and feed the result into an activation function defined by the used 
+            #using conditional statements
             sum = sum_weights(node['weights'],inputs)
             if(activation_func == "sigmoid"):
                 node['output'] = sigmoid(sum)
@@ -70,7 +74,9 @@ def forward_prop(net,row):
             elif(activation_func == "tanh"):
                 node['output'] = tanh(sum)
             else:
-                print("Please check hyperparameter activation_func")
+                #this is base case to make sure that there is a valid input for the activation function, else exit program
+                print("Please enter a valid hyperparameter for activation function of the following: sigmoid , tanh, relu")
+                exit()
             temp.append(node['output'])
         inputs = temp
     return inputs
