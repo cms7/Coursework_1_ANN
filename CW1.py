@@ -123,11 +123,11 @@ def squared_error(expected,output):
     return sum_err
     
 # Train a network for a fixed number of epochs
-def train_net(net, train):
+def train_net(net, data):
     error_l = []
     for epoch in range(num_epochs):
         sum_error = 0
-        for row in train:
+        for row in data:
             #expected data is either 1 or 0 for binary classification problem
             expected = [0,1]
             #use previous functions developed for training
