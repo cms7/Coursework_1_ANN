@@ -17,7 +17,7 @@ activation_func = input()
 # funtion will generate random weights for each input value, a bias is also genererated and will be the last element in the array
 # e.g. 3 inputs: weights = [0.1 , 0.3 , 0.2, 0.6] where element [-1] is the bias
 # number of hidden layers is configuarable through the funtion. 
-def initialize_network(n_inputs, n_hidden, n_hidden1, n_outputs):
+def initialise_network(n_inputs, n_hidden, n_hidden1, n_outputs):
     net = list()
     w1 = [{'weights': [random() for i in range(n_inputs+1)]} for i in range(n_hidden)]
     w2 = [{'weights': [random() for i in range(n_hidden+1)]} for i in range(n_hidden1)]
@@ -60,7 +60,7 @@ def sum_weights(weights, inputs):
  
 # Forward propagate input to a network output 
 def forward_prop(net,row):
-    inputs = row
+    inputs = row[:-1]
     for layer in net:
         temp = []
         for node in layer:
@@ -142,6 +142,7 @@ def train_net(net, train):
     for k in range(0,num_epochs):
         epoch_l += [k]
 
+
     #coding of the graphs produced
     fig = plt.figure(figsize=[7,5])
     ax = plt.subplot(111)
@@ -173,6 +174,6 @@ dataset = pd.read_csv('DATASET.csv')
 data = np.array(dataset,float)
 n_inputs = len(dataset.columns) - 1
 n_outputs = 2
-network = initialize_network(n_inputs, 2,2, n_outputs)
+network = initialise_network(n_inputs, 2,2, n_outputs)
 train_net(network, data)
 
