@@ -16,7 +16,7 @@ activation_func = input()
 # function to intitialise a network taking adjustable numbers of inputs, hidden and outputs
 # funtion will generate random weights for each input value, a bias is also genererated and will be the last element in the array
 # e.g. 3 inputs: weights = [0.1 , 0.3 , 0.2, 0.6] where element [-1] is the bias
-# number of hidden layers is configuarable through the funtion. 
+# number of hidden layers is configuarable through the funtion as w4 etc can be added easily 
 def initialise_network(n_inputs, n_hidden, n_hidden1, n_outputs):
     net = list()
     w1 = [{'weights': [random() for i in range(n_inputs+1)]} for i in range(n_hidden)]
@@ -57,7 +57,7 @@ def sum_weights(weights, inputs):
     for i in range(len(weights)-1):
         sum += weights[i] * float(inputs[i])
     return sum
- 
+
 # Function to forward propagte the network using loops to iterate over each node
 def forward_prop(net,row):
     inputs = row[:-1]
@@ -89,41 +89,52 @@ def squared_error(actual_output,output):
 
 # Function traverses the network backawards calculating gradient of weights.
 def backward_propagate_error(net, actual_output):
-    for i in reversed(range(len(net))):
-        errors_list = list() # errors are stored here
-        layer = net[i]
-        if i != len(net)-1:
-            for j in range(len(layer)):
-                node_error = 0.0
-                for node in net[i + 1]:
-                    node_error += (node['weights'][j] * node['diff'])
+    for layer_num in reversed(range(len(net))):
+        # errors are stored here
+        errors_list = list() 
+        layer = net[layer_num]
+        # checks whether it is the the output to hidden 2 layer, if not then checks the hidden layers with respect to the 
+        # weighted error from the output layer
+        if layer_num != len(net)-1:
+            #nested for loop which will traverse each node in layer and move backwards towards the first layer
+            for node_num in range(len(layer)):
+                node_error = 0
+                for node in net[layer_num + 1]:
+                    #this works out the total error for each node
+                    node_error += (node['weights'][node_num] * node['diff'])
                 errors_list.append(node_error)
         else:
-            for j in range(len(layer)):
-                node = layer[j]
-                errors_list.append(actual_output[j] - node['output'])
-        for j in range(len(layer)):
-            node = layer[j]
+            #this part takes the difference between actual output and the output the system has got
+            for node_num in range(len(layer)):
+                node = layer[node_num]
+                err = actual_output[node_num] - node['output']
+                errors_list.append(err)
+        
+        #iterates throug each layer calculating the derivatives and storing the values in 'diff'
+        for node_num in range(len(layer)):
+            node = layer[node_num]
             #conditional statements which set the correct derivatave
             if(activation_func == "sigmoid"):
-                node['diff'] =  sigmoid_derivative(node['output']) * errors_list[j] 
+                node['diff'] =  sigmoid_derivative(node['output']) * errors_list[node_num] 
             elif(activation_func == "relu"):
-                node['diff'] = relu_derivative(node['output']) * errors_list[j] 
+                node['diff'] = relu_derivative(node['output']) * errors_list[node_num] 
             elif(activation_func == "tanh"):
-                node['diff'] = tanh_derivative(node['output']) * errors_list[j] 
+                node['diff'] = tanh_derivative(node['output']) * errors_list[node_num] 
             else:
-                print("Please check hyperparameter activation_func")
+                #this is base case to make sure that there is a valid input for the activation function, else exit program
+                print("Please enter a valid hyperparameter for activation function of the following: sigmoid , tanh, relu")
+                exit()
 
 # Function to tune the weights of each nodes connections
 def update_weights(net, row):
-    for i in range(len(net)):
-        inputs = row[:-1]
-        if i != 0:
-            inputs = [node['output'] for node in net[i - 1]]
-        for node in net[i]:
-            for j in range(len(inputs)):
+    for layer_num in range(len(net)):
+        input = row[:-1]
+        if layer_num != 0:
+            input = [node['output'] for node in net[layer_num - 1]]
+        for node in net[layer_num]:
+            for node_num in range(len(input)):
             #update each respective weight 
-                node['weights'][j] += learning_rate * inputs[j] * node['diff'] 
+                node['weights'][node_num] += learning_rate * input[node_num] * node['diff'] 
             #updates the bias 
             node['weights'][-1] += learning_rate * node['diff']
 
@@ -161,7 +172,13 @@ def train_net(net, data):
     #Set labels
     ax.set_xlabel('Number of epochs')
     ax.set_ylabel('Summed error')
-    ax.set_title('ReLU (rectified linear unit)')
+    if(activation_func == "sigmoid"):
+        ax.set_title('Sigmoid') 
+    elif(activation_func == "relu"):
+        ax.set_title('ReLU (rectified linear unit)') 
+    else:
+        ax.set_title('Tanh')
+                
     ax.grid('on')
 
     #Tweak labels
