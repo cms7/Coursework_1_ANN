@@ -50,7 +50,7 @@ def relu_derivative(node_output):
     else: 
         return 1
 
-# Calculate neuron activation for an input
+# This will calculate the neurons activation value
 def sum_weights(weights, inputs):
     # weights[-1] will act as the bias, this takes the last element in the array of weights, which previously was identified.
     sum = weights[-1]
@@ -58,7 +58,7 @@ def sum_weights(weights, inputs):
         sum += weights[i] * float(inputs[i])
     return sum
  
-# Forward propagate input to a network output 
+# Function to forward propagte the network using loops to iterate over each node
 def forward_prop(net,row):
     inputs = row[:-1]
     for layer in net:
@@ -81,60 +81,67 @@ def forward_prop(net,row):
         inputs = temp
     return inputs
 
-# Backpropagate error and store in neurons
-def backward_propagate_error(net, expected):
+#error function to calculate the sum of squared errors
+def squared_error(actual_output,output):
+    sum_err = sum([(actual_output[i]-output[i])**2 for i in range(len(actual_output))])
+    return sum_err
+    
+
+# Function traverses the network backawards calculating gradient of weights.
+def backward_propagate_error(net, actual_output):
     for i in reversed(range(len(net))):
+        errors_list = list() # errors are stored here
         layer = net[i]
-        errors = list()
         if i != len(net)-1:
             for j in range(len(layer)):
-                error = 0.0
+                node_error = 0.0
                 for node in net[i + 1]:
-                    error += (node['weights'][j] * node['delta'])
-                errors.append(error)
+                    node_error += (node['weights'][j] * node['diff'])
+                errors_list.append(node_error)
         else:
             for j in range(len(layer)):
                 node = layer[j]
-                errors.append(expected[j] - node['output'])
+                errors_list.append(actual_output[j] - node['output'])
         for j in range(len(layer)):
             node = layer[j]
+            #conditional statements which set the correct derivatave
             if(activation_func == "sigmoid"):
-                node['delta'] = errors[j] * sigmoid_derivative(node['output'])
+                node['diff'] =  sigmoid_derivative(node['output']) * errors_list[j] 
             elif(activation_func == "relu"):
-                node['delta'] = errors[j] * relu_derivative(node['output'])
+                node['diff'] = relu_derivative(node['output']) * errors_list[j] 
             elif(activation_func == "tanh"):
-                node['delta'] = errors[j] * tanh_derivative(node['output'])
+                node['diff'] = tanh_derivative(node['output']) * errors_list[j] 
             else:
                 print("Please check hyperparameter activation_func")
-# Update network weights with error
+
+# Function to tune the weights of each nodes connections
 def update_weights(net, row):
     for i in range(len(net)):
         inputs = row[:-1]
         if i != 0:
             inputs = [node['output'] for node in net[i - 1]]
-        for node in network[i]:
+        for node in net[i]:
             for j in range(len(inputs)):
-                node['weights'][j] += learning_rate * node['delta'] * inputs[j]
-            node['weights'][-1] += learning_rate * node['delta']
+            #update each respective weight 
+                node['weights'][j] += learning_rate * inputs[j] * node['diff'] 
+            #updates the bias 
+            node['weights'][-1] += learning_rate * node['diff']
 
-#error function to calculate the sum of squared errors
-def squared_error(expected,output):
-    sum_err = sum([(expected[i]-output[i])**2 for i in range(len(expected))])
-    return sum_err
-    
-# Train a network for a fixed number of epochs
+
+# Network is trained over a fixed number of epochs which is set by the user
 def train_net(net, data):
     error_l = []
     for epoch in range(num_epochs):
         sum_error = 0
         for row in data:
             #expected data is either 1 or 0 for binary classification problem
-            expected = [0,1]
+            actual_output = [0,1]
             #use previous functions developed for training
             forward_prop_output = forward_prop(net, row)
-            sum_error += squared_error(expected,forward_prop_output)
-            backward_propagate_error(net, expected)
+            sum_error += squared_error(actual_output,forward_prop_output)
+            backward_propagate_error(net, actual_output)
             update_weights(net, row)
+        #prints in terminal for user to follow
         print('Epoch number = %d, Learning Rate = %.3f, Total Error = %.3f' % (epoch, learning_rate, sum_error))
         error_l.append(sum_error)
     #storing epochs values so they can be used for the following graphs
@@ -169,11 +176,16 @@ def train_net(net, data):
     ttl.set_weight('bold')
     plt.show()
 
+#seed(1) ensures each test will use the same generated weights
 seed(1)
 dataset = pd.read_csv('DATASET.csv')
 data = np.array(dataset,float)
+
+#sets the required inputs and outputs for dataset
 n_inputs = len(dataset.columns) - 1
 n_outputs = 2
-network = initialise_network(n_inputs, 2,2, n_outputs)
-train_net(network, data)
+
+#create and test network
+net = initialise_network(n_inputs, 2,2, n_outputs)
+train_net(net, data)
 
